@@ -42,7 +42,7 @@ win.$(addRowBtn)
 // set up some CSS
 GM_addStyle([
     // just let the page do the scrolling
-    'div#TimesheetContainer { max-height: none; }',
+    'div#TimesheetContainer { max-height: none; } ',
     // make the Add Row button look good
     '#myAddRowBtn {',
        'background: #DEF1FA;',
@@ -50,10 +50,10 @@ GM_addStyle([
        'border: 1px solid;',
        'padding: 3px;',
        'border-radius: 8px;',
-    '},',
+    '} ',
     '#myAddRowBtn .t-sprite {',
        'margin-right: 3px;',
-    '}'
+    '} '
   ].join(''));
 
 // default all unset rows to Worked
