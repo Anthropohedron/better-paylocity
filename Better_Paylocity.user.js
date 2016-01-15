@@ -4,7 +4,8 @@
 // @description Improvements to the Paylocity UI
 // @include     https://webtime2.paylocity.com/webtime/Employee/Timesheet
 // @include     https://webtime2.paylocity.com/webtime/Employee/Timesheet#
-// @version     0.1.0
+// @downloadURL https://raw.githubusercontent.com/Anthropohedron/better-paylocity/master/Better_Paylocity.user.js
+// @version     0.1.1
 // @grant       GM_addStyle
 // @grant       unsafeWindow
 // ==/UserScript==
@@ -49,7 +50,7 @@ GM_addStyle([
        'border: 1px solid;',
        'padding: 3px;',
        'border-radius: 8px;',
-    '},'
+    '},',
     '#myAddRowBtn .t-sprite {',
        'margin-right: 3px;',
     '}'
