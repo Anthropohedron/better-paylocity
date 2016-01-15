@@ -5,7 +5,7 @@
 // @include     https://webtime2.paylocity.com/webtime/Employee/Timesheet
 // @include     https://webtime2.paylocity.com/webtime/Employee/Timesheet#
 // @downloadURL https://raw.githubusercontent.com/Anthropohedron/better-paylocity/master/Better_Paylocity.user.js
-// @version     0.1.1
+// @version     0.1.2
 // @grant       GM_addStyle
 // @grant       unsafeWindow
 // ==/UserScript==
