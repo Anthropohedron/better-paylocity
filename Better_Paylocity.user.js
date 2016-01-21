@@ -5,7 +5,7 @@
 // @include     https://webtime2.paylocity.com/webtime/Employee/Timesheet
 // @include     https://webtime2.paylocity.com/webtime/Employee/Timesheet#
 // @downloadURL https://raw.githubusercontent.com/Anthropohedron/better-paylocity/master/Better_Paylocity.user.js
-// @version     0.1.2
+// @version     0.2.0
 // @grant       GM_addStyle
 // @grant       unsafeWindow
 // ==/UserScript==
@@ -15,6 +15,17 @@
 // the page can't call functions defined in this context, so export to the
 // page
 function ef(fn) { return exportFunction(fn, win); }
+
+var payTypeSuffix = /PayTypeId$/;
+
+var onPayTypeChanged = ef(function onPayTypeChanged() {
+  var chargeCode = win.$("#" + this.id.replace(payTypeSuffix, 'LaborLevel'));
+  if (this.value == 9) {
+    chargeCode.show();
+  } else {
+    chargeCode.hide();
+  }
+});
 
 // exported function to be called by jQuery's each
 var eachWorked = ef(function eachWorked() { this.value = 9; });
@@ -38,6 +49,10 @@ var addRowBtn = win.$.parseHTML([
 win.$(addRowBtn)
   .click(win.addShift)
   .click(ef(defaultWorked));
+
+win.$(doc).on('change',
+    'select[id^=TimeSheet_][id*=__Entries_][id$=__PayTypeId]',
+    onPayTypeChanged);
 
 // set up some CSS
 GM_addStyle([
