@@ -50,6 +50,26 @@ win.$(addRowBtn)
   .click(win.addShift)
   .click(ef(defaultWorked));
 
+var chargeCodeDropdown = null;
+
+var replaceChargeCode = ef(function replaceChargeCode() {
+  var chargeCode = $(this);
+  //TODO
+});
+
+$.ajax({
+  type:"GET",
+  url: $('#TimeSheet_0__Entries_0__LaborLevel')
+    .data('pPopupWindow')
+    .getPopupUrl(),
+  dataType:"html",
+  success: function(data) {
+    chargeCodeDropdown = $($.parseHTML(data)).find('#LaborLevelEdit0');
+    win.$('.p-widget.p-filtercontrol[id^=TimeSheet_][id*=__Entries_][id$=__LaborLevel]').each(replaceChargeCode);
+  }
+});
+
+
 win.$(doc).on('change',
     'select[id^=TimeSheet_][id*=__Entries_][id$=__PayTypeId]',
     onPayTypeChanged);
