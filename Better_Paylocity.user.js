@@ -18,10 +18,11 @@ var $ = win.jQuery;
 // page
 function ef(fn) { return exportFunction(fn, win); }
 
-var payTypeSuffix = /PayTypeId$/;
+var payTypeRE = /PayTypeId$/;
+var chargeCodeSuffix = '//////////////';
 
 var onPayTypeChanged = ef(function onPayTypeChanged() {
-  var chargeCode = $("#" + this.id.replace(payTypeSuffix, 'LaborLevel'));
+  var chargeCode = $("#" + this.id.replace(payTypeRE, 'LaborLevel'));
   if (this.value == 9) {
     chargeCode.show();
   } else {
@@ -86,14 +87,17 @@ function runInWindowContext() {
       .toArray();
     var i, len = items.length;
     var options = [
-      '<option value="//////////////">Unassigned</option>'
+      '<option value="',
+      chargeCodeSuffix,
+      '">Unassigned</option>'
     ];
     for (i=0; i<len; i += 2) {
       if (items[i].trim()) {
         options.push(
             '<option value="',
             items[i],
-            '//////////////">',
+            chargeCodeSuffix,
+            '">',
             items[i+1],
             '</option>'
             );
