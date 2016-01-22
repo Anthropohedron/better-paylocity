@@ -10,7 +10,7 @@
 // @grant       unsafeWindow
 // ==/UserScript==
 
-(function(win, doc) {
+(function(win) {
 
 var $ = win.jQuery;
 
@@ -114,7 +114,7 @@ winEval(function wc_addRow() {
       row.parents('.day-end').prev('td.day').append(addRowBtn);
     } else {
       // no appropriate row, so make sure the Add Row button is gone
-      $(addRowBtn).remove();
+      $(addRowBtn).detach();
     }
     return result;
   }
