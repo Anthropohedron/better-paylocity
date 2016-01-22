@@ -52,24 +52,72 @@ $(addRowBtn)
   .click(win.addShift)
   .click(ef(defaultWorked));
 
-var chargeCodeDropdown = null;
+function runInWindowContext() {
 
-var replaceChargeCode = ef(function replaceChargeCode() {
-  var chargeCode = $(this);
-  //TODO
-});
+  var chargeCodeOptions =
+    '<option value="//////////////" selected="selected">Unassigned</option>';
 
-$.ajax({
-  type:"GET",
-  url: $('#TimeSheet_0__Entries_0__LaborLevel')
-    .data('pPopupWindow')
-    .getPopupUrl(),
-  dataType:"html",
-  success: function(data) {
-    chargeCodeDropdown = $($.parseHTML(data)).find('#LaborLevelEdit0');
-    win.$('.p-widget.p-filtercontrol[id^=TimeSheet_][id*=__Entries_][id$=__LaborLevel]').each(replaceChargeCode);
+  function replaceChargeCode() {
+    var value = this.value;
+    var chargeCode = $(this).parents('.p-widget');
+    var html = [
+      '<select name="',
+      this.name,
+      ' id="',
+      this.id,
+      '">\n',
+      chargeCodeOptions,
+      '</select>'
+    ].join('');
+    chargeCode.html(html)
+      .find('input')
+      .value(value);
   }
-});
+
+  function replaceAllChargeCodes() {
+    $('.p-widget[id^=TimeSheet_][id*=__Entries_][id$=__LaborLevel] input')
+      .each(replaceChargeCode);
+  }
+
+  function onSuccess(data) {
+    var items = $($.parseHTML(data))
+      .find('#LaborLevelGrid0 > .t-grid-content > table > tbody > tr > td')
+      .map(function() { return $(this).text(); })
+      .toArray();
+    var i, len = items.length;
+    var options = [
+      '<option value="//////////////">Unassigned</option>'
+    ];
+    for (i=0; i<len; i += 2) {
+      if (items[i].trim()) {
+        options.push(
+            '<option value="',
+            items[i],
+            '//////////////">',
+            items[i+1],
+            '</option>'
+            );
+      }
+    }
+    chargeCodeOptions = options.join('');
+    replaceAllChargeCodes();
+  }
+
+  $(document).ready(function onReady() {
+    var url = $('#TimeSheet_0__Entries_0__LaborLevel')
+      .data('pPopupWindow')
+      .getPopupUrl();
+    var config = {
+      type:"GET",
+      url: url,
+      dataType:"html",
+      success: onSuccess
+    };
+    $.ajax(config);
+  });
+
+}
+win.eval('('+runInWindowContext.toString()+')();');
 
 
 $(doc).on('change',
