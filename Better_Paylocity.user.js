@@ -58,8 +58,11 @@ $(addRowBtn)
 
 function runInWindowContext() {
 
-  var chargeCodeOptions =
-    '<option value="//////////////" selected="selected">Unassigned</option>';
+  var chargeCodeOptions = '<option value="' +
+    chargeCodeSuffix +
+    '" selected="selected">' +
+    emptyChargeCodeLabel +
+    '</option>';
 
   function replaceChargeCode() {
     var value = this.value;
