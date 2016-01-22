@@ -12,6 +12,8 @@
 
 (function(win, doc) {
 
+var $ = win.jQuery;
+
 // the page can't call functions defined in this context, so export to the
 // page
 function ef(fn) { return exportFunction(fn, win); }
@@ -19,7 +21,7 @@ function ef(fn) { return exportFunction(fn, win); }
 var payTypeSuffix = /PayTypeId$/;
 
 var onPayTypeChanged = ef(function onPayTypeChanged() {
-  var chargeCode = win.$("#" + this.id.replace(payTypeSuffix, 'LaborLevel'));
+  var chargeCode = $("#" + this.id.replace(payTypeSuffix, 'LaborLevel'));
   if (this.value == 9) {
     chargeCode.show();
   } else {
@@ -32,13 +34,13 @@ var eachWorked = ef(function eachWorked() { this.value = 9; });
 
 // make any row with an unset "Pay Type" column default to "Worked"
 function defaultWorked() {
-  win.$('tr.pay-type-description > td > select > option[value=0][selected]')
+  $('tr.pay-type-description > td > select > option[value=0][selected]')
     .parent()
     .each(eachWorked);
 }
 
 // make custom Add Row button markup to be used later
-var addRowBtn = win.$.parseHTML([
+var addRowBtn = $.parseHTML([
     '<div id="myAddRowBtn" class="t-link">',
       '<span class="t-sprite p-tool-add"></span>',
       'Add&nbsp;Row',
@@ -46,7 +48,7 @@ var addRowBtn = win.$.parseHTML([
   ].join(''))[0];
 
 // attach handlers to the Add Row button click
-win.$(addRowBtn)
+$(addRowBtn)
   .click(win.addShift)
   .click(ef(defaultWorked));
 
@@ -70,7 +72,7 @@ $.ajax({
 });
 
 
-win.$(doc).on('change',
+$(doc).on('change',
     'select[id^=TimeSheet_][id*=__Entries_][id$=__PayTypeId]',
     onPayTypeChanged);
 
@@ -106,7 +108,7 @@ function wrapOnSelect(row) {
     row.parents('.day-end').prev('td.day').append(addRowBtn);
   } else {
     // no appropriate row, so make sure the Add Row button is gone
-    win.$(addRowBtn).remove();
+    $(addRowBtn).remove();
   }
   return result;
 }
