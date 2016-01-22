@@ -98,9 +98,17 @@ function runInWindowContext() {
     setChargeCode(chargeCode, value);
   }
 
-  function replaceAllChargeCodes() {
+  var pendingDomChange = false;
+  function onDomChange() {
     $('.p-widget[id^=TimeSheet_][id*=__Entries_][id$=__LaborLevel] input')
       .each(replaceChargeCode);
+    pendingDomChange = false;
+  }
+
+  function delayedDomChange() {
+    if (pendingDomChange) return;
+    pendingDomChange = true;
+    window.setTimeout(onDomChange, 1);
   }
 
   function onSuccess(data) {
@@ -130,7 +138,22 @@ function runInWindowContext() {
       }
     }
     chargeCodeOptions = options.join('');
-    replaceAllChargeCodes();
+
+    var observer = new MutationObserver(function(mutations) {
+      var i, len = mutations.length;
+      for (i=0; i<len; ++i) {
+        if (mutations[i].addedNodes.length) {
+          delayedDomChange();
+          return;
+        }
+      }
+    });
+
+    onDomChange();
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true
+    });
   }
 
   $(document).ready(function onReady() {
