@@ -80,11 +80,6 @@ winEval(function wc_defaultWorked() {
       .trigger('change');
   }
 
-  $(document).ready(function defaultWorkedOnReady() {
-    // default all unset rows to Worked
-    defaultWorked();
-  });
-
 });
 
 // display an add row button (in the window context)
@@ -98,9 +93,7 @@ winEval(function wc_addRow() {
   ].join(''))[0];
 
   // attach handlers to the Add Row button click
-  $(addRowBtn)
-    .on('click', addShift)
-    .on('click', defaultWorked);
+  $(addRowBtn).on('click', addShift);
 
   // wrap row selection to place the Add Row button at the associated day
   var wrappedOnSelect = selectEntryRow;
@@ -150,6 +143,7 @@ winEval(function wc_chargeCode() {
   function onDomChange() {
     $('.p-widget[id^=TimeSheet_][id*=__Entries_][id$=__LaborLevel] input')
       .each(replaceChargeCode);
+    defaultWorked();
     pendingDomChange = false;
   }
 
