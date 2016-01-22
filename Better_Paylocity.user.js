@@ -68,9 +68,9 @@ function runInWindowContext() {
     var value = this.value;
     var chargeCode = $(this).parents('.p-widget');
     var html = [
-      '<select name="',
+      '<select class="p-select" name="',
       this.name,
-      ' id="',
+      '" id="',
       this.id,
       '">\n',
       chargeCodeOptions,
