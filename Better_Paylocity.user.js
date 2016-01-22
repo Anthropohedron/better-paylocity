@@ -18,63 +18,111 @@ var $ = win.jQuery;
 // page
 function ef(fn) { return exportFunction(fn, win); }
 
-var payTypeRE = /PayTypeId$/;
-var emptyChargeCodeLabel = 'Unassigned';
-win.emptyChargeCodeLabel = emptyChargeCodeLabel;
-var chargeCodeSuffix = '//////////////';
-win.chargeCodeSuffix = chargeCodeSuffix;
+// run the function in the context of the window
+function winEval(fn) {
+  win.eval('('+fn.toString()+')();');
+}
 
-function setChargeCode(chargeCode, value) {
-  chargeCode = $(chargeCode);
-  if (!value) value = chargeCodeSuffix;
-  var select = chargeCode.find('select')[0];
+winEval(function wc_setChargeCode() {
 
-  if (select) {
-    select.value = value;
-  } else {
-    select = chargeCode.find('input')[0];
+  window.emptyChargeCodeLabel = 'Unassigned';
+  window.chargeCodeSuffix = '//////////////';
+
+  window.setChargeCode = function setChargeCode(chargeCode, value) {
+    chargeCode = $(chargeCode);
+    if (!value) value = chargeCodeSuffix;
+    var select = chargeCode.find('select')[0];
+
     if (select) {
       select.value = value;
-      chargeCode.find('label').html(emptyChargeCodeLabel);
+    } else {
+      select = chargeCode.find('input')[0];
+      if (select) {
+        select.value = value;
+        chargeCode.find('label').html(emptyChargeCodeLabel);
+      }
     }
   }
-}
-win.setChargeCode = ef(setChargeCode);
 
-var onPayTypeChanged = ef(function onPayTypeChanged() {
-  var chargeCode = $("#" + this.id.replace(payTypeRE, 'LaborLevel'));
-  if (this.value == 9) {
-    chargeCode.show();
-  } else {
-    chargeCode.hide();
-    setChargeCode(chargeCode);
-  }
 });
 
-// exported function to be called by jQuery's each
-var eachWorked = ef(function eachWorked() { this.value = 9; });
+// fix up charge codes (in the window context)
+winEval(function wc_payType() {
 
-// make any row with an unset "Pay Type" column default to "Worked"
-function defaultWorked() {
-  $('tr.pay-type-description > td > select > option[value=0][selected]')
-    .parent()
-    .each(eachWorked);
-}
+  var payTypeRE = /PayTypeId$/;
 
-// make custom Add Row button markup to be used later
-var addRowBtn = $.parseHTML([
+  function onPayTypeChanged() {
+    var chargeCode = $("#" + this.id.replace(payTypeRE, 'LaborLevel'));
+    if (this.value == 9) {
+      chargeCode.show();
+    } else {
+      chargeCode.hide();
+      setChargeCode(chargeCode);
+    }
+  };
+
+  // watch pay type to hide charge code when not Worked
+  $(document).on('change',
+      'select[id^=TimeSheet_][id*=__Entries_][id$=__PayTypeId]',
+      onPayTypeChanged);
+});
+
+winEval(function wc_defaultWorked() {
+  // exported function to be called by jQuery's each
+  function eachWorked() {
+    if (this.value == 0) this.value = 9;
+  };
+
+  // make any row with an unset "Pay Type" column default to "Worked"
+  window.defaultWorked = function defaultWorked() {
+    $('tr.pay-type-description > td > select')
+      .each(eachWorked)
+      .trigger('change');
+  }
+
+  $(document).ready(function defaultWorkedOnReady() {
+    // default all unset rows to Worked
+    defaultWorked();
+  });
+
+});
+
+// display an add row button (in the window context)
+winEval(function wc_addRow() {
+  // make custom Add Row button markup to be used later
+  var addRowBtn = $.parseHTML([
     '<div id="myAddRowBtn" class="t-link">',
       '<span class="t-sprite p-tool-add"></span>',
       'Add&nbsp;Row',
     '</div>'
   ].join(''))[0];
 
-// attach handlers to the Add Row button click
-$(addRowBtn)
-  .click(win.addShift)
-  .click(ef(defaultWorked));
+  // attach handlers to the Add Row button click
+  $(addRowBtn)
+    .on('click', addShift)
+    .on('click', defaultWorked);
 
-function runInWindowContext() {
+  // wrap row selection to place the Add Row button at the associated day
+  var wrappedOnSelect = selectEntryRow;
+  selectEntryRow = function wrapOnSelect(row) {
+    // call wrapped function
+    var result = wrappedOnSelect(row);
+    // get the newly-selected row
+    var row = getSelectedEntryRow();
+    if (row) {
+      // if it's appropriate, add the Add Row button near the row
+      row.parents('.day-end').prev('td.day').append(addRowBtn);
+    } else {
+      // no appropriate row, so make sure the Add Row button is gone
+      $(addRowBtn).remove();
+    }
+    return result;
+  }
+
+});
+
+// fix up charge codes (in the window context)
+winEval(function wc_chargeCode() {
 
   var chargeCodeOptions = '<option value="' +
     chargeCodeSuffix +
@@ -156,7 +204,7 @@ function runInWindowContext() {
     });
   }
 
-  $(document).ready(function onReady() {
+  $(document).ready(function chargeCodeOnReady() {
     var url = $('#TimeSheet_0__Entries_0__LaborLevel')
       .data('pPopupWindow')
       .getPopupUrl();
@@ -169,13 +217,11 @@ function runInWindowContext() {
     $.ajax(config);
   });
 
-}
-win.eval('('+runInWindowContext.toString()+')();');
+});
 
-
-$(doc).on('change',
-    'select[id^=TimeSheet_][id*=__Entries_][id$=__PayTypeId]',
-    onPayTypeChanged);
+// hide the "Update Charge Codes" button, which doesn't work on the charge
+// code select but is much less needed because of that change
+$('#TimesheetToolbar .t-sprite.p-tool-ll-info').parents('li').hide();
 
 // set up some CSS
 GM_addStyle([
@@ -193,27 +239,6 @@ GM_addStyle([
        'margin-right: 3px;',
     '} '
   ].join(''));
-
-// default all unset rows to Worked
-defaultWorked();
-
-// wrap row selection to place the Add Row button at the associated day
-var wrappedOnSelect = win.selectEntryRow;
-function wrapOnSelect(row) {
-  // call wrapped function
-  var result = wrappedOnSelect(row);
-  // get the newly-selected row
-  var row = win.getSelectedEntryRow();
-  if (row) {
-    // if it's appropriate, add the Add Row button near the row
-    row.parents('.day-end').prev('td.day').append(addRowBtn);
-  } else {
-    // no appropriate row, so make sure the Add Row button is gone
-    $(addRowBtn).remove();
-  }
-  return result;
-}
-win.selectEntryRow = ef(wrapOnSelect);
 
 })(unsafeWindow, unsafeWindow.document);
 
