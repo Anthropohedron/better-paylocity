@@ -68,16 +68,30 @@ winEval(function wc_payType() {
 });
 
 winEval(function wc_defaultWorked() {
+
+  var payTypeRE = /PayTypeId$/;
+
+  var fakeSelectedEntryRow = null;
+  function fakeGetSelectedEntryRow() {
+    return fakeSelectedEntryRow;
+  }
+
   // exported function to be called by jQuery's each
   function eachWorked() {
-    if (this.value == 0) this.value = 9;
+    var select = $(this);
+    if (select.val() == 0) {
+      var realGetSelectedEntryRow = window.getSelectedEntryRow;
+      window.getSelectedEntryRow = fakeGetSelectedEntryRow;
+      fakeSelectedEntryRow = select.parents('tr.pay-type-description');
+      select.val(9).trigger('change');
+      window.getSelectedEntryRow = realGetSelectedEntryRow;
+    }
   };
 
   // make any row with an unset "Pay Type" column default to "Worked"
   window.defaultWorked = function defaultWorked() {
     $('tr.pay-type-description > td > select')
-      .each(eachWorked)
-      .trigger('change');
+      .each(eachWorked);
   }
 
 });
