@@ -24,12 +24,30 @@ win.emptyChargeCodeLabel = emptyChargeCodeLabel;
 var chargeCodeSuffix = '//////////////';
 win.chargeCodeSuffix = chargeCodeSuffix;
 
+function setChargeCode(chargeCode, value) {
+  chargeCode = $(chargeCode);
+  if (!value) value = chargeCodeSuffix;
+  var select = chargeCode.find('select')[0];
+
+  if (select) {
+    select.value = value;
+  } else {
+    select = chargeCode.find('input')[0];
+    if (select) {
+      select.value = value;
+      chargeCode.find('label').html(emptyChargeCodeLabel);
+    }
+  }
+}
+win.setChargeCode = ef(setChargeCode);
+
 var onPayTypeChanged = ef(function onPayTypeChanged() {
   var chargeCode = $("#" + this.id.replace(payTypeRE, 'LaborLevel'));
   if (this.value == 9) {
     chargeCode.show();
   } else {
     chargeCode.hide();
+    setChargeCode(chargeCode);
   }
 });
 
@@ -76,9 +94,8 @@ function runInWindowContext() {
       chargeCodeOptions,
       '</select>'
     ].join('');
-    chargeCode.html(html)
-      .find('input')
-      .value(value);
+    chargeCode.html(html);
+    setChargeCode(chargeCode, value);
   }
 
   function replaceAllChargeCodes() {
