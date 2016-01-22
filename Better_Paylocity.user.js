@@ -19,7 +19,10 @@ var $ = win.jQuery;
 function ef(fn) { return exportFunction(fn, win); }
 
 var payTypeRE = /PayTypeId$/;
+var emptyChargeCodeLabel = 'Unassigned';
+win.emptyChargeCodeLabel = emptyChargeCodeLabel;
 var chargeCodeSuffix = '//////////////';
+win.chargeCodeSuffix = chargeCodeSuffix;
 
 var onPayTypeChanged = ef(function onPayTypeChanged() {
   var chargeCode = $("#" + this.id.replace(payTypeRE, 'LaborLevel'));
@@ -89,8 +92,11 @@ function runInWindowContext() {
     var options = [
       '<option value="',
       chargeCodeSuffix,
-      '">Unassigned</option>'
+      '">',
+      emptyChargeCodeLabel,
+      '</option>'
     ];
+
     for (i=0; i<len; i += 2) {
       if (items[i].trim()) {
         options.push(
