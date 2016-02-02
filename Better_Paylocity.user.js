@@ -24,11 +24,18 @@ function winEval(fn) {
 }
 
 winEval(function wc_floatingToolbar() {
-  var bars = $('#TimesheetCallToActions').parent();
-  bars.addClass('my-floating-toolbar');
-  $('.no-print .header-14').parent().css({
-    'border-top': ""+bars.height()+"px solid white"
+
+  var bar = $('#TimesheetCallToActions').parent();
+  var hdr = $('.no-print .header-14').parent();
+
+  bar.addClass('my-floating-toolbar');
+
+  hdr.css({
+    'border-top': ""+(bar.height()+7)+"px solid white"
+  }).find('.header-bar-14,.header-nav-14').css({
+    'z-index': 0
   });
+
 });
 
 winEval(function wc_setChargeCode() {
@@ -211,10 +218,6 @@ $('#TimesheetToolbar .t-sprite.p-tool-ll-info').parents('li').hide();
 GM_addStyle([
     // just let the page do the scrolling
     'div#TimesheetContainer { max-height: none; } ',
-    // make the toolbar wide if the window is wide enough
-    '.my-floating-toolbar > ul {',
-      'display: inline-block;',
-    '} ',
     // make the toolbar float
     '.my-floating-toolbar {',
       'background: white;',
@@ -225,8 +228,8 @@ GM_addStyle([
       'opacity: 0.9;',
       'border-bottom: 1px solid gray;',
       'z-index: 1000;',
-    '} '
-  ].join(''));
+    '}'
+  ].join('\n'));
 
 })(unsafeWindow, unsafeWindow.document);
 
