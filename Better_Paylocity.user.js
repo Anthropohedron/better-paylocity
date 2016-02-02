@@ -5,7 +5,7 @@
 // @include     https://webtime2.paylocity.com/webtime/Employee/Timesheet
 // @include     https://webtime2.paylocity.com/webtime/Employee/Timesheet#
 // @downloadURL https://raw.githubusercontent.com/Anthropohedron/better-paylocity/master/Better_Paylocity.user.js
-// @version     0.2.0
+// @version     0.3.0
 // @grant       GM_addStyle
 // @grant       unsafeWindow
 // ==/UserScript==
@@ -22,6 +22,14 @@ function ef(fn) { return exportFunction(fn, win); }
 function winEval(fn) {
   win.eval('('+fn.toString()+')();');
 }
+
+winEval(function wc_floatingToolbar() {
+  var bars = $('#TimesheetCallToActions').parent();
+  bars.addClass('my-floating-toolbar');
+  $('.no-print .header-14').parent().css({
+    'border-top': ""+bars.height()+"px solid white"
+  });
+});
 
 winEval(function wc_setChargeCode() {
 
@@ -92,38 +100,6 @@ winEval(function wc_defaultWorked() {
   window.defaultWorked = function defaultWorked() {
     $('tr.pay-type-description > td > select')
       .each(eachWorked);
-  }
-
-});
-
-// display an add row button (in the window context)
-winEval(function wc_addRow() {
-  // make custom Add Row button markup to be used later
-  var addRowBtn = $.parseHTML([
-    '<div id="myAddRowBtn" class="t-link">',
-      '<span class="t-sprite p-tool-add"></span>',
-      'Add&nbsp;Row',
-    '</div>'
-  ].join(''))[0];
-
-  // attach handlers to the Add Row button click
-  $(addRowBtn).on('click', addShift);
-
-  // wrap row selection to place the Add Row button at the associated day
-  var wrappedOnSelect = selectEntryRow;
-  selectEntryRow = function wrapOnSelect(row) {
-    // call wrapped function
-    var result = wrappedOnSelect(row);
-    // get the newly-selected row
-    var row = getSelectedEntryRow();
-    if (row) {
-      // if it's appropriate, add the Add Row button near the row
-      row.parents('.day-end').prev('td.day').append(addRowBtn);
-    } else {
-      // no appropriate row, so make sure the Add Row button is gone
-      $(addRowBtn).detach();
-    }
-    return result;
   }
 
 });
@@ -235,16 +211,20 @@ $('#TimesheetToolbar .t-sprite.p-tool-ll-info').parents('li').hide();
 GM_addStyle([
     // just let the page do the scrolling
     'div#TimesheetContainer { max-height: none; } ',
-    // make the Add Row button look good
-    '#myAddRowBtn {',
-       'background: #DEF1FA;',
-       'margin-top: 10px;',
-       'border: 1px solid;',
-       'padding: 3px;',
-       'border-radius: 8px;',
+    // make the toolbar wide if the window is wide enough
+    '.my-floating-toolbar > ul {',
+      'display: inline-block',
     '} ',
-    '#myAddRowBtn .t-sprite {',
-       'margin-right: 3px;',
+    // make the toolbar float
+    '.my-floating-toolbar {',
+      'background: white',
+      'position: fixed',
+      'left: 0',
+      'top: 0',
+      'width: 100%',
+      'opacity: 0.9',
+      'border-bottom: 1px solid gray',
+      'z-index: 1000',
     '} '
   ].join(''));
 
