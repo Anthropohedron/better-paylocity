@@ -213,18 +213,18 @@ GM_addStyle([
     'div#TimesheetContainer { max-height: none; } ',
     // make the toolbar wide if the window is wide enough
     '.my-floating-toolbar > ul {',
-      'display: inline-block',
+      'display: inline-block;',
     '} ',
     // make the toolbar float
     '.my-floating-toolbar {',
-      'background: white',
-      'position: fixed',
-      'left: 0',
-      'top: 0',
-      'width: 100%',
-      'opacity: 0.9',
-      'border-bottom: 1px solid gray',
-      'z-index: 1000',
+      'background: white;',
+      'position: fixed;',
+      'left: 0;',
+      'top: 0;',
+      'width: 100%;',
+      'opacity: 0.9;',
+      'border-bottom: 1px solid gray;',
+      'z-index: 1000;',
     '} '
   ].join(''));
 
