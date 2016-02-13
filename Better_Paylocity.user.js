@@ -5,7 +5,7 @@
 // @include     https://webtime2.paylocity.com/webtime/Employee/Timesheet
 // @include     https://webtime2.paylocity.com/webtime/Employee/Timesheet#
 // @downloadURL https://raw.githubusercontent.com/Anthropohedron/better-paylocity/master/Better_Paylocity.user.js
-// @version     0.3.0
+// @version     0.3.1
 // @grant       GM_addStyle
 // @grant       unsafeWindow
 // ==/UserScript==
@@ -27,8 +27,6 @@ winEval(function wc_floatingToolbar() {
 
   var bar = $('#TimesheetCallToActions').parent();
   var hdr = $('.no-print .header-14').parent();
-
-  bar.addClass('my-floating-toolbar');
 
   hdr.css({
     'border-top': ""+(bar.height()+7)+"px solid white"
@@ -138,6 +136,7 @@ winEval(function wc_chargeCode() {
 
   var pendingDomChange = false;
   function onDomChange() {
+    $('#TimesheetCallToActions').parent().addClass('my-floating-toolbar');
     $('.p-widget[id^=TimeSheet_][id*=__Entries_][id$=__LaborLevel] input')
       .each(replaceChargeCode);
     defaultWorked();
